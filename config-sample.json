@@ -1,0 +1,22 @@
+{
+    "confluence": {
+      "baseUrl": "https://your-domain.atlassian.net/wiki",
+      "apiToken": "your-api-token",
+      "username": "your-email@example.com"
+    },
+    "export": {
+      "spaceKey": "TEAM",
+      "outputDir": "./output",
+      "recursive": true,
+      "includeAttachments": true,
+      "concurrentRequests": 5,
+      "format": {
+        "includeFrontMatter": true,
+        "preserveLinks": true
+      }
+    },
+    "logging": {
+      "level": "info",
+      "file": "confluence-export.log"
+    }
+  }
