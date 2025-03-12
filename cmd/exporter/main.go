@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -11,6 +12,7 @@ import (
 	"confluence-exporter/internal/api"
 	"confluence-exporter/internal/config"
 	"confluence-exporter/internal/converter"
+	"confluence-exporter/internal/models"
 )
 
 func main() {
@@ -82,7 +84,15 @@ func main() {
 				}
 
 				fmt.Printf("  Saving %d attachments\n", len(attachments))
-				// Download attachments logic would go here
+				for _, attachment := range attachments {
+					outputPath := filepath.Join(attachmentsDir, attachment.FileName)
+					fmt.Printf("    Downloading: %s\n", attachment.FileName)
+
+					if err := downloadAttachment(client, attachment, outputPath); err != nil {
+						log.Printf("Failed to download attachment %s: %v", attachment.FileName, err)
+						continue
+					}
+				}
 			}
 		}
 	}
@@ -107,4 +117,28 @@ func getSafeFilename(name string) string {
 		" ", "_",
 	)
 	return replacer.Replace(name)
+}
+
+// downloadAttachment downloads and saves an attachment to disk
+func downloadAttachment(client *api.ConfluenceClient, attachment models.Attachment, outputPath string) error {
+	// Construct the full download URL
+	downloadURL := client.GetBaseURL() + attachment.DownloadURL
+
+	// Get the file
+	resp, err := client.GetAttachmentContent(downloadURL)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Create the output file
+	out, err := os.Create(outputPath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	// Write the content to the file
+	_, err = io.Copy(out, resp.Body)
+	return err
 }

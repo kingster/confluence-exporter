@@ -225,3 +225,22 @@ func (c *ConfluenceClient) sendRequest(method, endpoint string, params url.Value
 	// Send the request
 	return c.HTTPClient.Do(req)
 }
+
+// GetAttachmentContent downloads the content of an attachment
+func (c *ConfluenceClient) GetAttachmentContent(downloadURL string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", downloadURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add basic auth header
+	auth := base64.StdEncoding.EncodeToString([]byte(c.Username + ":" + c.APIToken))
+	req.Header.Add("Authorization", "Basic "+auth)
+
+	return c.HTTPClient.Do(req)
+}
+
+// GetBaseURL returns the base URL of the Confluence instance
+func (c *ConfluenceClient) GetBaseURL() string {
+	return c.BaseURL
+}
