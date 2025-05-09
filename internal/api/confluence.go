@@ -40,10 +40,11 @@ func (c *ConfluenceClient) GetSpaces() ([]models.Space, error) {
 
 	var allSpaces []models.Space
 	start := 0
-	limit := 25
+	limit := 500
 
 	for {
 		params := url.Values{}
+		params.Add("type", "global")
 		params.Add("start", strconv.Itoa(start))
 		params.Add("limit", strconv.Itoa(limit))
 
@@ -81,7 +82,7 @@ func (c *ConfluenceClient) GetPages(spaceKey string) ([]models.Page, error) {
 
 	var allPages []models.Page
 	start := 0
-	limit := 25
+	limit := 100
 
 	for {
 		params := url.Values{}
